@@ -6,8 +6,8 @@ import { MatInputModule } from '@angular/material/input';
 import { HttpClientModule } from '@angular/common/http';
 
 import { AppComponent } from './app.component';
-import { FormsModule } from '@angular/forms';
-import { CepService } from './cep.service';
+import { FormsModule } from '@angular/forms'; 
+import { CepService } from './shared/services/cep.service';
 
 @NgModule({
 	declarations: [
