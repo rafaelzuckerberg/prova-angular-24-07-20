@@ -1,3 +1,5 @@
+import { User } from './shared/class/user';
+import { UserService } from './shared/services/user.service';
 import { CepService } from './shared/services/cep.service';
 import { Component } from '@angular/core'; 
 
@@ -7,37 +9,29 @@ import { Component } from '@angular/core';
 	styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-	
+
 	title = 'teste-helpper'
 
-	persons = [
-		// {
-		// 	name: 'Teste',
-		// 	cpf: 'Teste',
-		// 	phone: 'Teste',
-		// 	email: 'Teste',
-		// 	cep: 'Teste',
-		// 	state: 'Teste',
-		// 	city: 'Teste',
-		// 	street: 'Teste',
-		// }
-	]
+	persons = []
 	columns = ['name', 'cpf', 'phone', 'email', 'cep', 'state', 'city', 'street', 'actions']
-	selectedPerson
+	selectedPerson: User;
 	loading
+	btn_texto: string = 'Salvar';
 
-	addPerson() {
-		this.selectedPerson = {}
+	constructor(public cep: CepService, private service: UserService) { }
+
+	ngOnInit() {
+		if (!this.service.get() || !JSON.parse(this.service.get()).length) this.service.populateTable()
+		this.persons = JSON.parse(this.service.get())
+		console.log(this.selectedPerson)
 	}
 
-	editPerson(person) {
-		this.selectedPerson = { ...person }
-	}
 
 	deletePerson(person) {
-		remove(person)
-		this.persons = JSON.parse(get())
+		this.service.remove(person)
+		this.persons = JSON.parse(this.service.get());
 	}
+
 
 	changeCep(event) {
 		var cep = event.target.value
@@ -62,9 +56,11 @@ export class AppComponent {
 		}
 	}
 
+
 	cancel() {
 		this.selectedPerson = null
 	}
+
 
 	submit(person) {
 		var error = false
@@ -77,83 +73,21 @@ export class AppComponent {
 		if (error) {
 			alert('Erro!\nPreencha todos os campos!')
 		} else {
-			save(person)
-			this.persons = JSON.parse(get())
+			this.service.save(person)
+			this.persons = JSON.parse(this.service.get())
 			this.selectedPerson = null
 		}
 	}
 
-	ngOnInit() {
-		if (!get() || !JSON.parse(get()).length) populateTable()
-		this.persons = JSON.parse(get())
+
+	addPerson() {
+		this.selectedPerson = {}
 	}
 
-	constructor(public cep: CepService) { }
+
+	editPerson(person) {
+		this.selectedPerson = { ...person }
+		this.btn_texto = 'Editar';
+	}
 }
 
-// function populateTable() {
-// 	var persons = [
-// 		{
-// 			name: 'Maria Flores',
-// 			cpf: '83321492075',
-// 			phone: '1533283928',
-// 			email: 'maria_f@gmail.com',
-// 			cep: '69906043',
-// 			state: 'AC',
-// 			city: 'Rio Branco',
-// 			street: 'Rua Arnaldo Aleixo (Conjunto Canaã)',
-// 		},
-// 		{
-// 			name: 'João Carlos',
-// 			cpf: '31213393035',
-// 			phone: '1532841040',
-// 			email: 'joao.c@gmail.com',
-// 			cep: '79096766',
-// 			state: 'MS',
-// 			city: 'Campo Grande',
-// 			street: 'Rua Rodolfho José Rospide da Motta',
-// 		},
-// 		{
-// 			name: 'Stephanie Dias',
-// 			cpf: '02085196020',
-// 			phone: '1533294040',
-// 			email: 'ste.dias@gmail.com',
-// 			cep: '23825080',
-// 			state: 'RJ',
-// 			city: 'Itaguaí',
-// 			street: 'Rua Mario Bastos Filho',
-// 		},
-// 		{
-// 			name: 'Mirtes Souza',
-// 			cpf: '33764389001',
-// 			phone: '1530178756',
-// 			email: 'irma.mirtes@gmail.com',
-// 			cep: '40420150',
-// 			state: 'BA',
-// 			city: 'Salvador',
-// 			street: '1ª Travessa Clóvis de Almeida Maia',
-// 		}
-// 	]
-
-// 	localStorage.setItem('persons', JSON.stringify(persons))
-// }
-
-// function get() {
-// 	return localStorage.getItem('persons')
-// }
-
-function save(person) {
-	var persons = JSON.parse(localStorage.getItem('persons'))
-	var index = persons.findIndex(foundPerson => Number(foundPerson.cpf) == Number(person.cpf))
-	if (index == -1) index = persons.length
-	persons[index] = person
-	localStorage.setItem('persons', JSON.stringify(persons))
-}
-
-function remove(person) {
-	var persons = JSON.parse(localStorage.getItem('persons'))
-	var cpf = Number(person.cpf)
-	var index = persons.findIndex(foundPerson => foundPerson.cpf == String(cpf))
-	persons.splice(index, 1)
-	localStorage.setItem('persons', JSON.stringify(persons))
-}
