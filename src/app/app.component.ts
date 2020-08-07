@@ -1,7 +1,10 @@
 import { User } from './shared/class/user';
 import { UserService } from './shared/services/user.service';
 import { CepService } from './shared/services/cep.service';
-import { Component } from '@angular/core'; 
+import { Component, ViewChild } from '@angular/core'; 
+import { MatTableDataSource } from '@angular/material/table';
+import { MatSort } from '@angular/material/sort';
+import { MatPaginator } from '@angular/material/paginator';
 
 @Component({
 	selector: 'app-root',
@@ -11,19 +14,29 @@ import { Component } from '@angular/core';
 export class AppComponent {
 
 	title = 'teste-helpper'
-
-	persons = []
-	columns = ['name', 'cpf', 'phone', 'email', 'cep', 'state', 'city', 'street', 'actions']
+	// persons = []
+	columns: string[] = ['name', 'cpf', 'phone', 'email', 'cep', 'state', 'city', 'street', 'actions']
 	selectedPerson: User;
 	loading
 	btn_texto: string = 'Salvar';
+	persons: MatTableDataSource<User>;
+	
+	@ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
+  	@ViewChild(MatSort, {static: true}) sort: MatSort;
 
 	constructor(public cep: CepService, private service: UserService) { }
 
 	ngOnInit() {
 		if (!this.service.get() || !JSON.parse(this.service.get()).length) this.service.populateTable()
-		this.persons = JSON.parse(this.service.get())
-		console.log(this.selectedPerson)
+		// this.persons = JSON.parse(this.service.get());
+		this.getUsers();
+	}
+
+
+	getUsers() {
+		this.persons = new MatTableDataSource(JSON.parse(this.service.get()));
+		this.persons.paginator = this.paginator;
+		this.persons.sort = this.sort;
 	}
 
 
@@ -89,5 +102,14 @@ export class AppComponent {
 		this.selectedPerson = { ...person }
 		this.btn_texto = 'Editar';
 	}
+
+
+	applyFilter(filterValue: string) {
+		this.persons.filter = filterValue.trim().toLowerCase();
+	
+		if (this.persons.paginator) {
+		  this.persons.paginator.firstPage();
+		}
+	  }
 }
 
