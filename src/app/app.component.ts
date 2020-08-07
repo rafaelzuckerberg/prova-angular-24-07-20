@@ -14,7 +14,6 @@ import { MatPaginator } from '@angular/material/paginator';
 export class AppComponent {
 
 	title = 'teste-helpper'
-	// persons = []
 	columns: string[] = ['name', 'cpf', 'phone', 'email', 'cep', 'state', 'city', 'street', 'actions']
 	selectedPerson: User;
 	loading
@@ -28,7 +27,6 @@ export class AppComponent {
 
 	ngOnInit() {
 		if (!this.service.get() || !JSON.parse(this.service.get()).length) this.service.populateTable()
-		// this.persons = JSON.parse(this.service.get());
 		this.getUsers();
 	}
 
